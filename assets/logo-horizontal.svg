@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 305 92" role="img" aria-label="SUNSET SANAT">
+  <g fill="none" stroke="#d4af76" stroke-width="1.9" stroke-linecap="round">
+    <path d="M132 20a21 21 0 0 1 42 0"/>
+    <path d="M153 0v13M131 2l9 12M175 2l-9 12M120 12l14 6M186 12l-14 6"/>
+    <path d="M128 20h51"/>
+  </g>
+  <text x="152.5" y="64" text-anchor="middle" fill="#e9d4af" font-family="Georgia,'Times New Roman',serif" font-size="40" letter-spacing="4.5">SUNSET</text>
+  <text x="152.5" y="84" text-anchor="middle" fill="#e9d4af" font-family="Arial,sans-serif" font-size="12" letter-spacing="7">SANAT</text>
+</svg>
