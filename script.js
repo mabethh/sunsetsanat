@@ -31,6 +31,78 @@
     });
   });
 
+  // Duyurular, ayrı bir dosyadaki bilgilerden oluşturulur.
+  const announcementsList = document.querySelector('#announcements-list');
+  const announcements = Array.isArray(window.SUNSET_DUYURULAR) ? window.SUNSET_DUYURULAR : [];
+  const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, character => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[character]);
+  const safeAsset = value => /^assets\/[a-z0-9_./-]+\.(?:jpe?g|png|webp|svg)$/i.test(String(value)) ? value : '';
+  const instagramUrl = 'https://www.instagram.com/sunsetsanatatolyesi/';
+
+  if (announcementsList) {
+    const validAnnouncements = announcements.filter(item => item && item.baslik && Array.isArray(item.gorseller) && item.gorseller.some(image => safeAsset(image.dosya)));
+    if (!validAnnouncements.length) {
+      announcementsList.innerHTML = '<p class="announcements-empty">Yakında yeni etkinliklerimizi burada paylaşacağız. Güncel program için Instagram üzerinden bize ulaşabilirsiniz.</p>';
+    } else {
+      announcementsList.innerHTML = validAnnouncements.map((item, index) => {
+        const images = item.gorseller.filter(image => image && safeAsset(image.dosya));
+        const first = images[0];
+        const endDate = item.tarihISO && /^\d{4}-\d{2}-\d{2}$/.test(item.tarihISO)
+          ? new Date(`${item.tarihISO}T${/^\d{2}:\d{2}$/.test(item.bitisSaati) ? item.bitisSaati : '23:59'}:00+03:00`)
+          : null;
+        const isPast = endDate && !Number.isNaN(endDate.getTime()) && endDate < new Date();
+        const points = Array.isArray(item.icerik) ? item.icerik : [];
+        const reservation = typeof item.rezervasyon === 'string' && item.rezervasyon.startsWith('https://www.instagram.com/') ? item.rezervasyon : instagramUrl;
+        return `<article class="announcement-card" aria-labelledby="announcement-${index}-title">
+          <div class="announcement-gallery">
+            <button class="announcement-cover" type="button" data-lightbox="${escapeHTML(first.dosya)}" data-caption="${escapeHTML(first.aciklama || item.baslik)}" aria-label="Afişi büyüt: ${escapeHTML(first.aciklama || item.baslik)}">
+              <img src="${escapeHTML(first.dosya)}" alt="${escapeHTML(first.aciklama || item.baslik)}" loading="lazy" width="1122" height="1402">
+              <span class="announcement-zoom" aria-hidden="true">↗</span>
+            </button>
+            ${images.length > 1 ? `<div class="announcement-thumbnails" role="group" aria-label="Etkinlik afişleri">
+              ${images.map((image, i) => `<button class="announcement-thumb" type="button" data-poster="${escapeHTML(image.dosya)}" data-description="${escapeHTML(image.aciklama || item.baslik)}" aria-label="${i + 1}. afişi göster" aria-pressed="${i === 0}"><img src="${escapeHTML(image.dosya)}" alt="" loading="lazy" width="130" height="160"></button>`).join('')}
+            </div>` : ''}
+          </div>
+          <div class="announcement-info">
+            <p class="announcement-kicker">${escapeHTML(item.tur || 'SUNSET SANAT ETKİNLİĞİ')}</p>
+            <h3 id="announcement-${index}-title">${escapeHTML(item.baslik)}</h3>
+            <span class="announcement-badge${isPast ? ' is-past' : ''}">${isPast ? '✳ GERÇEKLEŞEN ETKİNLİK' : '✳ YAKLAŞAN ETKİNLİK'}</span>
+            <div class="announcement-meta">
+              <div><span class="meta-label">TARİH</span><strong>${escapeHTML(item.tarih)}</strong></div>
+              <div><span class="meta-label">SAAT</span><strong>${escapeHTML(item.saat)}</strong></div>
+              <div><span class="meta-label">YER</span><strong>${escapeHTML(item.yer)}</strong></div>
+              <div><span class="meta-label">KONTENJAN</span><strong>${escapeHTML(item.kontenjan)}</strong></div>
+            </div>
+            ${item.spot ? `<p class="announcement-spot">${escapeHTML(item.spot)}</p>` : ''}
+            <p class="announcement-description">${escapeHTML(item.aciklama)}</p>
+            ${points.length ? `<ul class="announcement-points">${points.map(point => `<li>${escapeHTML(point)}</li>`).join('')}</ul>` : ''}
+            <div class="announcement-actions">
+              <a class="button button-dark" href="${escapeHTML(reservation)}" target="_blank" rel="noopener noreferrer">${isPast ? 'Yeni Etkinlikleri Sor' : 'Rezervasyon Yap'} <span aria-hidden="true">↗</span></a>
+              <span class="announcement-actions-note">${isPast ? 'Yeni workshoplar için bize DM gönderin.' : 'Bilgi ve kayıt için Instagram’dan DM gönderin.'}</span>
+            </div>
+          </div>
+        </article>`;
+      }).join('');
+
+      announcementsList.querySelectorAll('.announcement-gallery').forEach(gallery => {
+        const cover = gallery.querySelector('.announcement-cover');
+        const coverImage = cover?.querySelector('img');
+        gallery.querySelectorAll('.announcement-thumb').forEach(thumbnail => thumbnail.addEventListener('click', () => {
+          if (!cover || !coverImage) return;
+          const src = thumbnail.dataset.poster;
+          const description = thumbnail.dataset.description;
+          coverImage.src = src;
+          coverImage.alt = description;
+          cover.dataset.lightbox = src;
+          cover.dataset.caption = description;
+          cover.setAttribute('aria-label', `Afişi büyüt: ${description}`);
+          gallery.querySelectorAll('.announcement-thumb').forEach(other => other.setAttribute('aria-pressed', String(other === thumbnail)));
+        }));
+      });
+    }
+  }
+
   const lightbox = document.querySelector('#lightbox');
   const lightboxImg = lightbox?.querySelector('img');
   const lightboxCaption = lightbox?.querySelector('p');
