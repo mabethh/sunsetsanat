@@ -33,5 +33,14 @@ window.SUNSET_DUYURULAR = [
       { dosya: 'assets/duyuru-akrilik-kahve-katilim.jpg', aciklama: 'Katılım ve detaylı bilgi için iletişime geçebilirsiniz' },
       { dosya: 'assets/duyuru-akrilik-kahve-konum.jpg', aciklama: 'Sunset Sanat adresi — Çamlık Mahallesi, Zengin Sokak 61/A' }
     ]
+  },
+  {
+    baslik: 'Sunset Sanat’ta Seramik Zamanı!',
+    tur: 'SERAMİK · ATÖLYEDEN ANLAR',
+    durum: 'gerceklesen',
+    spot: 'Sunset Sanat’ta seramik zamanı! 🤎',
+    aciklama: 'Biraz kil, biraz hayal gücü, bolca keyif… Her parça kendi hikâyesini anlatıyor. ✨',
+    video: 'assets/seramik-etkinligi.mp4',
+    gorseller: []
   }
 ];
